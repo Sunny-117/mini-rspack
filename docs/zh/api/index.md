@@ -2,18 +2,18 @@
 
 mini-rspack 提供了类似 webpack 的 JavaScript API。本节记录了可用的 API。
 
-## webpack
+## rspack
 
 创建编译器实例的主函数。
 
 ```javascript
-const { webpack } = require('mini-rspack');
-const compiler = webpack(options);
+const { rspack } = require('mini-rspack');
+const compiler = rspack(options);
 ```
 
 ### 参数
 
-- `options` (Object): webpack 配置选项
+- `options` (Object): rspack 配置选项
 
 ### 返回值
 
@@ -24,7 +24,7 @@ const compiler = webpack(options);
 `Compiler` 是 mini-rspack 的主入口点。它管理编译过程并为插件提供钩子。
 
 ```javascript
-const compiler = webpack(options);
+const compiler = rspack(options);
 
 // 运行编译器
 compiler.run((err, stats) => {

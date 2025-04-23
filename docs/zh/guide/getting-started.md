@@ -22,10 +22,10 @@ npm run build
 
 ```javascript
 const path = require('path');
-const { webpack } = require('mini-rspack');
+const { rspack } = require('mini-rspack');
 
-// 创建 webpack 选项
-const webpackOptions = {
+// 创建 rspack 选项
+const rspackOptions = {
   mode: 'production',
   entry: {
     entries: {
@@ -42,7 +42,7 @@ const webpackOptions = {
 };
 
 // 创建编译器实例
-const compiler = webpack(webpackOptions);
+const compiler = rspack(rspackOptions);
 
 // 运行编译器
 compiler.run((err, stats) => {
@@ -62,14 +62,14 @@ mini-rspack 支持监听模式，当文件变更时自动重新构建：
 
 ```javascript
 // 在选项中启用监听模式
-const webpackOptions = {
+const rspackOptions = {
   // ...
   watch: true,
   // ...
 };
 
 // 创建编译器实例
-const compiler = webpack(webpackOptions);
+const compiler = rspack(rspackOptions);
 
 // 以监听模式运行
 compiler.watch((err, stats) => {

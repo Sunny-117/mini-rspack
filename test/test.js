@@ -1,9 +1,9 @@
 const path = require('path');
-const { webpack } = require('../index');
+const { rspack } = require('../index');
 const EmitPlugin = require('../plugins/emit-plugin');
 
-// Create webpack options similar to the JS version
-const webpackOptions = {
+// Create rspack options similar to the JS version
+const rspackOptions = {
   mode: 'production',
   devtool: false,
   watch: false,
@@ -37,7 +37,7 @@ const webpackOptions = {
 };
 
 // Create a compiler instance
-const compiler = webpack(webpackOptions);
+const compiler = rspack(rspackOptions);
 
 // 调用run方法，可以启动编译
 compiler.run((err, stats) => {

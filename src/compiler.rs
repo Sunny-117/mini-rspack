@@ -2,7 +2,7 @@ use napi_derive::napi;
 use napi::threadsafe_function::{ThreadsafeFunction, ThreadsafeFunctionCallMode};
 use napi::{JsFunction, Result};
 
-use crate::WebpackOptions;
+use crate::RspackOptions;
 use crate::plugin::SyncHook;
 
 #[napi(object)]
@@ -26,7 +26,7 @@ pub struct Stats {
 #[napi]
 #[derive(Debug, Clone)]
 pub struct Compiler {
-    pub options: WebpackOptions,
+    pub options: RspackOptions,
     pub hooks: CompilerHooks,
 }
 
@@ -56,7 +56,7 @@ impl Compiler {
 }
 
 #[napi]
-pub fn create_compiler(options: WebpackOptions) -> Compiler {
+pub fn create_compiler(options: RspackOptions) -> Compiler {
     Compiler {
         options,
         hooks: CompilerHooks {

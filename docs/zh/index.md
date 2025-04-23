@@ -41,8 +41,8 @@ mini-rspack 是一个使用 Rust 和 Node.js 绑定实现的简化版 webpack �
 npm install mini-rspack
 
 # 创建配置文件
-const { webpack } = require('mini-rspack');
-const compiler = webpack(options);
+const { rspack } = require('mini-rspack');
+const compiler = rspack(options);
 
 # 运行编译器
 compiler.run((err, stats) => {

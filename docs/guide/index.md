@@ -19,8 +19,8 @@ mini-rspack follows similar concepts to webpack:
 The `Compiler` is the main entry point of mini-rspack. It manages the compilation process and provides hooks for plugins to tap into.
 
 ```javascript
-const { webpack } = require('mini-rspack');
-const compiler = webpack(options);
+const { rspack } = require('mini-rspack');
+const compiler = rspack(options);
 ```
 
 ### Compilation

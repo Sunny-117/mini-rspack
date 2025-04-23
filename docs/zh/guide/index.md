@@ -19,8 +19,8 @@ mini-rspack 遵循与 webpack 类似的概念：
 `Compiler` 是 mini-rspack 的主入口点。它管理编译过程并为插件提供钩子。
 
 ```javascript
-const { webpack } = require('mini-rspack');
-const compiler = webpack(options);
+const { rspack } = require('mini-rspack');
+const compiler = rspack(options);
 ```
 
 ### 编译 (Compilation)

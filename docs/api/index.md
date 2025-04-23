@@ -2,18 +2,18 @@
 
 mini-rspack provides a JavaScript API similar to webpack. This section documents the available APIs.
 
-## webpack
+## rspack
 
 The main function to create a compiler instance.
 
 ```javascript
-const { webpack } = require('mini-rspack');
-const compiler = webpack(options);
+const { rspack } = require('mini-rspack');
+const compiler = rspack(options);
 ```
 
 ### Parameters
 
-- `options` (Object): The webpack configuration options
+- `options` (Object): The rspack configuration options
 
 ### Returns
 
@@ -24,7 +24,7 @@ const compiler = webpack(options);
 The `Compiler` is the main entry point of mini-rspack. It manages the compilation process and provides hooks for plugins to tap into.
 
 ```javascript
-const compiler = webpack(options);
+const compiler = rspack(options);
 
 // Run the compiler
 compiler.run((err, stats) => {

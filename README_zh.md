@@ -41,9 +41,9 @@ npm run build
 
 ```javascript
 const path = require('path');
-const { webpack } = require('mini-rspack');
+const { rspack } = require('mini-rspack');
 
-const webpackOptions = {
+const rspackOptions = {
   mode: 'production',
   entry: {
     entries: {
@@ -73,7 +73,7 @@ const webpackOptions = {
 };
 
 // 创建编译器实例
-const compiler = webpack(webpackOptions);
+const compiler = rspack(rspackOptions);
 
 // 运行编译器
 compiler.run((err, stats) => {

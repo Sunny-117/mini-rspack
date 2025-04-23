@@ -310,10 +310,10 @@ if (!nativeBinding) {
   throw new Error(`Failed to load native binding`)
 }
 
-const { Compiler, createCompiler, runCompiler, watchCompiler, webpack } = nativeBinding
+const { Compiler, createCompiler, runCompiler, watchCompiler, rspack } = nativeBinding
 
 module.exports.Compiler = Compiler
 module.exports.createCompiler = createCompiler
 module.exports.runCompiler = runCompiler
 module.exports.watchCompiler = watchCompiler
-module.exports.webpack = webpack
+module.exports.rspack = rspack

@@ -41,9 +41,9 @@ Create a configuration file similar to webpack:
 
 ```javascript
 const path = require('path');
-const { webpack } = require('mini-rspack');
+const { rspack } = require('mini-rspack');
 
-const webpackOptions = {
+const rspackOptions = {
   mode: 'production',
   entry: {
     entries: {
@@ -73,7 +73,7 @@ const webpackOptions = {
 };
 
 // Create a compiler instance
-const compiler = webpack(webpackOptions);
+const compiler = rspack(rspackOptions);
 
 // Run the compiler
 compiler.run((err, stats) => {

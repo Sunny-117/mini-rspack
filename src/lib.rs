@@ -14,7 +14,7 @@ use compiler::Compiler;
 
 #[napi(object)]
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct WebpackOptions {
+pub struct RspackOptions {
     pub mode: Option<String>,
     pub devtool: Option<bool>,
     pub watch: Option<bool>,
@@ -61,7 +61,7 @@ pub struct RuleOptions {
 }
 
 #[napi]
-pub fn webpack(options: WebpackOptions) -> napi::Result<Compiler> {
+pub fn rspack(options: RspackOptions) -> napi::Result<Compiler> {
     // Process command line arguments if needed
 
     // Create a new compiler instance

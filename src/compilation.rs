@@ -8,7 +8,7 @@ use serde::{Deserialize, Serialize};
 use crate::module::Module;
 use crate::loader::{find_matching_loaders, apply_loaders};
 use crate::utils::to_unix_path;
-use crate::WebpackOptions;
+use crate::RspackOptions;
 use crate::plugin::SyncHook;
 
 #[napi(object)]
@@ -22,7 +22,7 @@ pub struct Chunk {
 #[napi(object)]
 #[derive(Debug, Clone)]
 pub struct Compilation {
-    pub options: WebpackOptions,
+    pub options: RspackOptions,
     pub entries: Vec<Chunk>,
     pub modules: Vec<Module>,
     pub chunks: Vec<Chunk>,
@@ -38,7 +38,7 @@ pub struct CompilationHooks {
 }
 
 impl Compilation {
-    pub fn new(options: WebpackOptions, hooks: CompilationHooks) -> Self {
+    pub fn new(options: RspackOptions, hooks: CompilationHooks) -> Self {
         Self {
             options,
             entries: Vec::new(),

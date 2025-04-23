@@ -15,7 +15,7 @@ export interface Stats {
   files: Array<string>
   assets: Array<string>
 }
-export declare function createCompiler(options: WebpackOptions): Compiler
+export declare function createCompiler(options: RspackOptions): Compiler
 export declare function runCompiler(compiler: Compiler, callback: (err: Error | null, arg: Stats) => any): void
 export declare function watchCompiler(compiler: Compiler, callback: (err: Error | null, arg: Stats) => any): void
 export interface Chunk {
@@ -24,7 +24,7 @@ export interface Chunk {
   modules: Array<Module>
 }
 export interface Compilation {
-  options: WebpackOptions
+  options: RspackOptions
   entries: Array<Chunk>
   modules: Array<Module>
   chunks: Array<Chunk>
@@ -52,7 +52,7 @@ export interface SyncHook {
   name: string
   taps: Array<string>
 }
-export interface WebpackOptions {
+export interface RspackOptions {
   mode?: string
   devtool?: boolean
   watch?: boolean
@@ -80,9 +80,9 @@ export interface RuleOptions {
   test: string
   use: Array<string>
 }
-export declare function webpack(options: WebpackOptions): Compiler
+export declare function rspack(options: RspackOptions): Compiler
 export declare class Compiler {
-  options: WebpackOptions
+  options: RspackOptions
   hooks: CompilerHooks
   run(callback: (...args: any[]) => any): void
   watch(callback: (...args: any[]) => any): void

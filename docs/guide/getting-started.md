@@ -22,10 +22,10 @@ Create a JavaScript file that uses mini-rspack:
 
 ```javascript
 const path = require('path');
-const { webpack } = require('mini-rspack');
+const { rspack } = require('mini-rspack');
 
-// Create webpack options
-const webpackOptions = {
+// Create rspack options
+const rspackOptions = {
   mode: 'production',
   entry: {
     entries: {
@@ -42,7 +42,7 @@ const webpackOptions = {
 };
 
 // Create a compiler instance
-const compiler = webpack(webpackOptions);
+const compiler = rspack(rspackOptions);
 
 // Run the compiler
 compiler.run((err, stats) => {
@@ -62,14 +62,14 @@ mini-rspack supports watch mode, which automatically rebuilds when files change:
 
 ```javascript
 // Enable watch mode in options
-const webpackOptions = {
+const rspackOptions = {
   // ...
   watch: true,
   // ...
 };
 
 // Create a compiler instance
-const compiler = webpack(webpackOptions);
+const compiler = rspack(rspackOptions);
 
 // Run in watch mode
 compiler.watch((err, stats) => {

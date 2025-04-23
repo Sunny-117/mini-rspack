@@ -41,8 +41,8 @@ mini-rspack is a simplified implementation of webpack bundler using Rust and Nod
 npm install mini-rspack
 
 # Create a configuration file
-const { webpack } = require('mini-rspack');
-const compiler = webpack(options);
+const { rspack } = require('mini-rspack');
+const compiler = rspack(options);
 
 # Run the compiler
 compiler.run((err, stats) => {
