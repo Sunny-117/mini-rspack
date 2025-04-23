@@ -1,0 +1,29 @@
+{
+  "name": "mini-rspack",
+  "version": "1.0.1",
+  "description": "A Rust implementation of mini-webpack",
+  "main": "index.js",
+  "scripts": {
+    "build": "napi build --platform --release",
+    "build:debug": "napi build --platform",
+    "test": "node test/test.js"
+  },
+  "keywords": [
+    "webpack",
+    "bundler",
+    "rust",
+    "napi-rs"
+  ],
+  "author": "",
+  "license": "MIT",
+  "type": "commonjs",
+  "devDependencies": {
+    "@napi-rs/cli": "^2.18.4"
+  },
+  "napi": {
+    "name": "mini-rspack",
+    "triples": {
+      "defaults": true
+    }
+  }
+}
