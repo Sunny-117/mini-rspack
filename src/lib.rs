@@ -56,6 +56,7 @@ pub struct ModuleOptions {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct RuleOptions {
     pub test: String,
+    #[serde(rename = "use")]
     pub use_: Vec<String>,
 }
 

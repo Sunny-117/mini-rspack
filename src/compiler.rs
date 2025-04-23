@@ -1,4 +1,5 @@
 use napi_derive::napi;
+use napi::threadsafe_function::{ThreadsafeFunction, ThreadsafeFunctionCallMode};
 
 use crate::WebpackOptions;
 use crate::plugin::SyncHook;
@@ -41,7 +42,7 @@ pub fn create_compiler(options: WebpackOptions) -> Compiler {
 }
 
 #[napi]
-pub fn run_compiler(compiler: Compiler, callback: napi::threadsafe_function::ThreadsafeFunction<Stats>) -> napi::Result<()> {
+pub fn run_compiler(compiler: &Compiler, callback: ThreadsafeFunction<Stats>) -> napi::Result<()> {
     // Call the run hook
     compiler.hooks.run.call(None);
 
@@ -63,16 +64,16 @@ pub fn run_compiler(compiler: Compiler, callback: napi::threadsafe_function::Thr
     // Call the callback with the stats
     callback.call(
         Ok(stats),
-        napi::threadsafe_function::ThreadsafeFunctionCallMode::Blocking,
+        ThreadsafeFunctionCallMode::Blocking,
     );
 
     Ok(())
 }
 
 #[napi]
-pub fn watch_compiler(compiler: Compiler, callback: napi::threadsafe_function::ThreadsafeFunction<Stats>) -> napi::Result<()> {
+pub fn watch_compiler(compiler: &Compiler, callback: ThreadsafeFunction<Stats>) -> napi::Result<()> {
     // First run
-    run_compiler(compiler.clone(), callback.clone())?;
+    run_compiler(compiler, callback.clone())?;
 
     // If watch is enabled, set up file watchers
     if let Some(true) = compiler.options.watch {

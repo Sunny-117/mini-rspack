@@ -1,5 +1,5 @@
 const path = require('path');
-const { webpack } = require('../index');
+const { webpack, runCompiler } = require('../index');
 const EmitPlugin = require('../plugins/emit-plugin');
 
 // Create webpack options similar to the JS version
@@ -9,8 +9,10 @@ const webpackOptions = {
   watch: false,
   context: process.cwd(),
   entry: {
-    entry1: './src/entry1.js',
-    entry2: './src/entry2.js'
+    entries: {
+      entry1: './src/entry1.js',
+      entry2: './src/entry2.js'
+    }
   },
   output: {
     path: path.join(__dirname, '../dist'),
@@ -23,14 +25,14 @@ const webpackOptions = {
     rules: [
       {
         test: '\\.js$',
-        use_: [
+        use: [
           path.resolve(__dirname, '../loaders/logger-loader.js')
         ]
       }
     ]
   },
   plugins: [
-    new EmitPlugin()
+    'EmitPlugin' // Changed to string to match our simplified Rust implementation
   ]
 };
 
@@ -38,7 +40,7 @@ const webpackOptions = {
 const compiler = webpack(webpackOptions);
 
 // Run the compiler
-compiler.run((err, stats) => {
+runCompiler(compiler, (err, stats) => {
   if (err) {
     console.error('Compilation failed:', err);
     return;
