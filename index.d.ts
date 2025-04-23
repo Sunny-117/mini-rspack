@@ -84,4 +84,6 @@ export declare function webpack(options: WebpackOptions): Compiler
 export declare class Compiler {
   options: WebpackOptions
   hooks: CompilerHooks
+  run(callback: (...args: any[]) => any): void
+  watch(callback: (...args: any[]) => any): void
 }

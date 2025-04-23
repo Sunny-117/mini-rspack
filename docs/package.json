@@ -1,0 +1,23 @@
+{
+  "name": "mini-rspack-docs",
+  "version": "1.0.0",
+  "description": "Documentation for mini-rspack",
+  "main": "index.js",
+  "scripts": {
+    "dev": "vitepress dev",
+    "build": "vitepress build",
+    "preview": "vitepress preview"
+  },
+  "keywords": [
+    "webpack",
+    "bundler",
+    "rust",
+    "napi-rs"
+  ],
+  "author": "",
+  "license": "MIT",
+  "type": "commonjs",
+  "devDependencies": {
+    "vitepress": "^1.6.3"
+  }
+}

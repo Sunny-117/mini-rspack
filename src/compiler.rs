@@ -1,5 +1,6 @@
 use napi_derive::napi;
 use napi::threadsafe_function::{ThreadsafeFunction, ThreadsafeFunctionCallMode};
+use napi::{JsFunction, Result};
 
 use crate::WebpackOptions;
 use crate::plugin::SyncHook;
@@ -30,6 +31,31 @@ pub struct Compiler {
 }
 
 #[napi]
+impl Compiler {
+    #[napi]
+    pub fn run(&self, callback: JsFunction) -> Result<()> {
+        // 将JsFunction转换为ThreadsafeFunction
+        let tsfn: ThreadsafeFunction<Stats> = callback.create_threadsafe_function(0, |ctx| {
+            Ok(vec![ctx.value])
+        })?;
+
+        // 调用内部实现
+        run_compiler_internal(self, tsfn)
+    }
+
+    #[napi]
+    pub fn watch(&self, callback: JsFunction) -> Result<()> {
+        // 将JsFunction转换为ThreadsafeFunction
+        let tsfn: ThreadsafeFunction<Stats> = callback.create_threadsafe_function(0, |ctx| {
+            Ok(vec![ctx.value])
+        })?;
+
+        // 调用内部实现
+        watch_compiler_internal(self, tsfn)
+    }
+}
+
+#[napi]
 pub fn create_compiler(options: WebpackOptions) -> Compiler {
     Compiler {
         options,
@@ -41,8 +67,8 @@ pub fn create_compiler(options: WebpackOptions) -> Compiler {
     }
 }
 
-#[napi]
-pub fn run_compiler(compiler: &Compiler, callback: ThreadsafeFunction<Stats>) -> napi::Result<()> {
+// 内部函数，不导出到JS
+fn run_compiler_internal(compiler: &Compiler, callback: ThreadsafeFunction<Stats>) -> Result<()> {
     // Call the run hook
     compiler.hooks.run.call(None);
 
@@ -70,10 +96,10 @@ pub fn run_compiler(compiler: &Compiler, callback: ThreadsafeFunction<Stats>) ->
     Ok(())
 }
 
-#[napi]
-pub fn watch_compiler(compiler: &Compiler, callback: ThreadsafeFunction<Stats>) -> napi::Result<()> {
+// 内部函数，不导出到JS
+fn watch_compiler_internal(compiler: &Compiler, callback: ThreadsafeFunction<Stats>) -> Result<()> {
     // First run
-    run_compiler(compiler, callback.clone())?;
+    run_compiler_internal(compiler, callback.clone())?;
 
     // If watch is enabled, set up file watchers
     if let Some(true) = compiler.options.watch {
@@ -83,4 +109,15 @@ pub fn watch_compiler(compiler: &Compiler, callback: ThreadsafeFunction<Stats>) 
     }
 
     Ok(())
+}
+
+// 这些函数保留但不再导出到JS
+#[napi]
+pub fn run_compiler(compiler: &Compiler, callback: ThreadsafeFunction<Stats>) -> Result<()> {
+    run_compiler_internal(compiler, callback)
+}
+
+#[napi]
+pub fn watch_compiler(compiler: &Compiler, callback: ThreadsafeFunction<Stats>) -> Result<()> {
+    watch_compiler_internal(compiler, callback)
 }

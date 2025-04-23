@@ -1,5 +1,5 @@
 const path = require('path');
-const { webpack, runCompiler } = require('../index');
+const { webpack } = require('../index');
 const EmitPlugin = require('../plugins/emit-plugin');
 
 // Create webpack options similar to the JS version
@@ -39,8 +39,8 @@ const webpackOptions = {
 // Create a compiler instance
 const compiler = webpack(webpackOptions);
 
-// Run the compiler
-runCompiler(compiler, (err, stats) => {
+// 调用run方法，可以启动编译
+compiler.run((err, stats) => {
   if (err) {
     console.error('Compilation failed:', err);
     return;
@@ -49,3 +49,12 @@ runCompiler(compiler, (err, stats) => {
   console.log('Compilation successful!');
   console.log('Stats:', JSON.stringify(stats, null, 2));
 });
+
+// 也可以使用watch方法进行监听模式编译
+// compiler.watch((err, stats) => {
+//   if (err) {
+//     console.error('Watch compilation failed:', err);
+//     return;
+//   }
+//   console.log('Watch compilation successful!');
+// });
