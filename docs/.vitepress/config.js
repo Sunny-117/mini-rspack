@@ -1,13 +1,14 @@
 export default {
   base: '/mini-rspack/',
   title: 'mini-rspack',
-  description: 'A simplified implementation of webpack bundler using Rust',
+  description: 'A simplified implementation of webpack/rspack bundler using Rust for educational purposes',
   themeConfig: {
     logo: '/logo.png',
     nav: [
       { text: 'Home', link: '/' },
       { text: 'Guide', link: '/guide/' },
       { text: 'API', link: '/api/' },
+      { text: 'Advanced', link: '/advanced/' },
       { text: 'GitHub', link: 'https://github.com/Sunny-117/mini-rspack' }
     ],
     sidebar: {
@@ -20,6 +21,7 @@ export default {
             { text: 'Configuration', link: '/guide/configuration' },
             { text: 'Plugins', link: '/guide/plugins' },
             { text: 'Loaders', link: '/guide/loaders' },
+            { text: 'Architecture', link: '/guide/architecture' },
           ]
         }
       ],
@@ -32,6 +34,18 @@ export default {
             { text: 'Compilation', link: '/api/compilation' },
             { text: 'Module', link: '/api/module' },
             { text: 'Hooks', link: '/api/hooks' },
+            { text: 'Loader', link: '/api/loader' },
+            { text: 'Plugin', link: '/api/plugin' },
+          ]
+        }
+      ],
+      '/advanced/': [
+        {
+          text: 'Advanced',
+          items: [
+            { text: 'Technical Implementation', link: '/advanced/' },
+            { text: 'Testing', link: '/advanced/testing' },
+            { text: 'Performance', link: '/advanced/performance' },
           ]
         }
       ]

@@ -1,6 +1,6 @@
 # mini-rspack
 
-mini-rspack is a simplified implementation of webpack bundler using Rust and Node.js bindings. It demonstrates how to create a JavaScript bundler with Rust for improved performance.
+mini-rspack is a simplified implementation of Rspack bundler using Rust and Node.js bindings. It demonstrates how to create a JavaScript bundler with Rust for improved performance.
 
 [English](README.md) | [中文](README_zh.md)
 
@@ -10,16 +10,22 @@ mini-rspack is a proof-of-concept JavaScript bundler that uses Rust for the core
 
 - Create Node.js native modules with Rust using napi-rs
 - Implement a simplified bundler architecture
+- Parse and analyze JavaScript modules
+- Resolve module dependencies
+- Transform code with loaders
+- Extend functionality with plugins
+- Generate bundled output
 - Provide a familiar webpack-like API
 
 ## Features
 
-- Webpack-compatible API
-- Entry point processing
-- Basic module resolution
-- Plugin system with hooks
-- Loader support
-- Watch mode
+- Webpack-compatible API with compiler.run() method
+- Support for both CommonJS and ES modules
+- Entry point processing with multiple entry support
+- Module resolution with custom resolver
+- Plugin system with hooks (similar to Tapable)
+- Loader system for transforming module content
+- Watch mode for development
 
 ## Installation
 
@@ -100,11 +106,22 @@ compiler.watch((err, stats) => {
 
 mini-rspack consists of the following components:
 
-1. **Compiler**: The main entry point that manages the compilation process
-2. **Compilation**: Represents a single build of the application
-3. **Module**: Represents a module in the dependency graph
-4. **Loader**: Transforms module content
-5. **Plugin**: Extends the functionality of the bundler
+1. **Compiler**: The main entry point that manages the compilation process. Implemented in Rust with JavaScript bindings.
+2. **Compilation**: Represents a single build of the application. Manages the build process and holds the state of the compilation.
+3. **Module**: Represents a module in the dependency graph. Contains information about the module's source code, dependencies, and how it should be processed.
+4. **Loader**: Transforms module content. Implemented as JavaScript functions that can be chained together.
+5. **Plugin**: Extends the functionality of the bundler. Uses a hook system to tap into different stages of the compilation process.
+6. **Hook System**: Similar to webpack's Tapable, provides a way for plugins to tap into different stages of the compilation.
+7. **Resolver**: Resolves module paths and handles module resolution algorithms.
+
+### Technical Implementation
+
+- **Rust Core**: The core bundling logic is implemented in Rust for performance.
+- **napi-rs**: Used to create Node.js native modules from Rust code.
+- **JavaScript API**: Exposes a webpack-like API for configuration and usage.
+- **Module Parsing**: Uses regex and basic AST analysis to extract dependencies.
+- **Dependency Resolution**: Implements path resolution similar to Node.js module resolution.
+- **Code Generation**: Generates JavaScript bundle with proper module wrapping and runtime.
 
 ## Development
 
@@ -114,7 +131,30 @@ npm run build:debug
 
 # Run tests
 npm test
+
 ```
+
+## Documentation
+
+Detailed documentation is available in the `docs` directory. You can build and view the documentation using:
+
+```bash
+cd docs
+pnpm install
+pnpm docs:build
+pnpm preview
+```
+
+## Educational Resources
+
+This project is designed as an educational resource for learning about:
+
+- Modern JavaScript bundler architecture
+- Rust and JavaScript interoperability
+- Module resolution algorithms
+- Plugin and loader systems
+- AST parsing and code transformation
+- Performance optimization in build tools
 
 ## License
 

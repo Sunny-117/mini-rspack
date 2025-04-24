@@ -1,6 +1,6 @@
 # Introduction
 
-mini-rspack is a proof-of-concept JavaScript bundler that uses Rust for the core functionality and exposes a JavaScript API similar to webpack. It demonstrates how to create high-performance JavaScript tooling using Rust and Node.js native modules.
+mini-rspack is a proof-of-concept JavaScript bundler that uses Rust for the core functionality and exposes a JavaScript API similar to Rspack. It demonstrates how to create high-performance JavaScript tooling using Rust and Node.js native modules.
 
 ## Why mini-rspack?
 
@@ -9,6 +9,19 @@ Modern JavaScript bundlers like webpack are powerful but can be slow when proces
 1. **Better Performance**: Rust's speed and memory efficiency can significantly improve bundling times
 2. **Familiar API**: A webpack-compatible API makes it easy for developers to adopt
 3. **Learning Resource**: A simplified implementation to understand bundler architecture
+4. **Educational Value**: A practical example of Rust and JavaScript interoperability
+
+## Implementation
+
+mini-rspack is built with the following technologies and approaches:
+
+1. **Rust Core**: The core bundling logic is implemented in Rust for performance benefits
+2. **napi-rs**: Used to create Node.js native modules from Rust code with proper bindings
+3. **Module Parsing**: Uses regex and basic AST analysis to extract dependencies from JavaScript files
+4. **Dependency Resolution**: Implements path resolution similar to Node.js module resolution
+5. **Code Generation**: Generates JavaScript bundle with proper module wrapping and runtime
+6. **Plugin System**: Implements a hook-based plugin system similar to webpack's Tapable
+7. **Loader System**: Supports JavaScript-based loaders that can transform module content
 
 ## Core Concepts
 
@@ -16,28 +29,111 @@ mini-rspack follows similar concepts to webpack:
 
 ### Compiler
 
-The `Compiler` is the main entry point of mini-rspack. It manages the compilation process and provides hooks for plugins to tap into.
+The `Compiler` is the main entry point of mini-rspack. It manages the compilation process and provides hooks for plugins to tap into. Implemented in Rust with JavaScript bindings.
 
 ```javascript
-const { rspack } = require('mini-rspack');
-const compiler = rspack(options);
+const { createCompiler } = require('mini-rspack');
+const compiler = createCompiler(options);
+
+// Run the compiler
+compiler.run((err, stats) => {
+  // Handle compilation result
+});
 ```
 
 ### Compilation
 
-A `Compilation` represents a single build of the application. It contains the modules, chunks, and assets generated during the build.
+A `Compilation` represents a single build of the application. It contains the modules, chunks, and assets generated during the build. The compilation object manages the build process and holds the state of the compilation.
+
+```rust
+// Rust implementation
+pub struct Compilation {
+    pub modules: Vec<Module>,
+    pub chunks: Vec<Chunk>,
+    pub assets: HashMap<String, String>,
+    pub files: Vec<String>,
+    pub entries: HashMap<String, String>,
+    pub options: RspackOptions,
+    pub hooks: CompilationHooks,
+}
+```
 
 ### Module
 
-A `Module` represents a module in the dependency graph. It contains information about the module's source code, dependencies, and how it should be processed.
+A `Module` represents a module in the dependency graph. It contains information about the module's source code, dependencies, and how it should be processed. The module system supports both CommonJS and ES modules.
+
+```rust
+// Rust implementation
+pub struct Module {
+    pub id: String,
+    pub name: String,
+    pub source: String,
+    pub dependencies: Vec<Dependency>,
+}
+
+pub struct Dependency {
+    pub dep_module_id: String,
+    pub dep_module_path: String,
+}
+```
 
 ### Loader
 
-Loaders transform the content of modules. They can be used to process non-JavaScript files or to transform JavaScript code.
+Loaders transform the content of modules. They can be used to process non-JavaScript files or to transform JavaScript code. Loaders are implemented as JavaScript functions that can be chained together.
+
+```javascript
+// Example loader implementation
+module.exports = function(source, name, modulePath) {
+  // Transform the source code
+  const transformedSource = source.replace('Hello', 'Hello from Loader');
+  return transformedSource;
+};
+```
 
 ### Plugin
 
-Plugins extend the functionality of mini-rspack. They can tap into hooks provided by the compiler and compilation to modify the build process.
+Plugins extend the functionality of mini-rspack. They can tap into hooks provided by the compiler and compilation to modify the build process. The plugin system is similar to webpack's plugin system.
+
+```javascript
+// Example plugin implementation
+class MyPlugin {
+  apply(compiler) {
+    compiler.hooks.emit.tap('MyPlugin', (compilation) => {
+      // Modify the compilation
+      compilation.assets['my-file.txt'] = 'Generated by MyPlugin';
+    });
+  }
+}
+```
+
+### Hook System
+
+The hook system is similar to webpack's Tapable, providing a way for plugins to tap into different stages of the compilation process.
+
+```rust
+// Rust implementation
+pub struct SyncHook {
+    pub name: String,
+    pub taps: Vec<String>,
+}
+
+impl SyncHook {
+    pub fn new(name: &str) -> Self {
+        Self {
+            name: name.to_string(),
+            taps: Vec::new(),
+        }
+    }
+
+    pub fn tap(&mut self, name: &str) {
+        self.taps.push(name.to_string());
+    }
+
+    pub fn call(&self, args: Option<&mut HashMap<String, String>>) {
+        // Call the tapped functions
+    }
+}
+```
 
 ## Next Steps
 
