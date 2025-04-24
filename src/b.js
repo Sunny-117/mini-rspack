@@ -1,11 +1,11 @@
-// ESM module
-export const name = 'b';
+// ESM module converted to CommonJS
+const name = 'b';
 
-export function bb() {
+function bb() {
   return 'bb';
 }
 
-export default function defaultBB() {
+function defaultBB() {
   return 'default bb';
 }
 
@@ -15,4 +15,10 @@ const moduleInfo = {
   version: '1.0.0'
 };
 
-export { moduleInfo };
+// Use CommonJS exports
+module.exports = {
+  name,
+  bb,
+  moduleInfo,
+  default: defaultBB
+};

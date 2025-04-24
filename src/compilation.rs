@@ -68,21 +68,38 @@ impl Compilation {
             let entry_module = self.build_module(&entry_name, &entry_file_path, base_dir)?;
 
             // Create a chunk for this entry
-            // Deduplicate modules by ID
-            let mut unique_modules = Vec::new();
+            // Collect all modules for this entry, including dependencies
+            let mut chunk_modules = Vec::new();
             let mut module_ids = std::collections::HashSet::new();
 
-            for module in self.modules.iter().filter(|m| m.name == *entry_name) {
-                if !module_ids.contains(&module.id) {
-                    module_ids.insert(module.id.clone());
-                    unique_modules.push(module.clone());
+            // Helper function to collect all dependencies recursively
+            fn collect_dependencies(
+                module: &Module,
+                all_modules: &[Module],
+                collected_modules: &mut Vec<Module>,
+                collected_ids: &mut std::collections::HashSet<String>
+            ) {
+                // Add the module itself if not already added
+                if !collected_ids.contains(&module.id) {
+                    collected_ids.insert(module.id.clone());
+                    collected_modules.push(module.clone());
+
+                    // Process dependencies
+                    for dep in &module.dependencies {
+                        if let Some(dep_module) = all_modules.iter().find(|m| m.id == dep.dep_module_id) {
+                            collect_dependencies(dep_module, all_modules, collected_modules, collected_ids);
+                        }
+                    }
                 }
             }
+
+            // Start with the entry module
+            collect_dependencies(&entry_module, &self.modules, &mut chunk_modules, &mut module_ids);
 
             let chunk = Chunk {
                 name: entry_name.clone(),
                 entry_module: entry_module.clone(),
-                modules: unique_modules,
+                modules: chunk_modules,
             };
 
             // Add the chunk to entries and chunks

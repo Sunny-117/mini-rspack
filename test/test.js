@@ -11,7 +11,9 @@ const rspackOptions = {
   entry: {
     entries: {
       entry1: './src/entry1.js',
-      entry2: './src/entry2.js'
+      entry2: './src/entry2.js',
+      'entry-complex': './src/entry-complex.js',
+      'simple-test': './src/simple-test.js'
     }
   },
   output: {
