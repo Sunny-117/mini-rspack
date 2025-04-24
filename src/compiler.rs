@@ -6,7 +6,7 @@ use napi::{JsFunction, Result};
 use crate::RspackOptions;
 use crate::plugin::SyncHook;
 use crate::compilation::{Compilation, CompilationHooks};
-use crate::plugin::register_emit_plugin;
+use crate::plugin::register_plugin;
 
 #[napi(object)]
 #[derive(Debug, Clone)]
@@ -84,8 +84,8 @@ fn run_compiler_internal(compiler: &Compiler, callback: ThreadsafeFunction<Stats
 
     // 注册插件
     if let Some(plugins) = &compiler.options.plugins {
-        if plugins.contains(&"EmitPlugin".to_string()) {
-            register_emit_plugin(&mut compilation);
+        for plugin_name in plugins {
+            register_plugin(&mut compilation, plugin_name);
         }
     }
 

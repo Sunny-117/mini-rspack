@@ -6,7 +6,7 @@ use anyhow::Result;
 use serde::{Deserialize, Serialize};
 
 use crate::module::Module;
-use crate::loader::{find_matching_loaders, apply_loaders};
+use crate::loader_runner::{find_matching_loaders, apply_loaders};
 use crate::utils::to_unix_path;
 use crate::RspackOptions;
 use crate::plugin::SyncHook;
@@ -173,6 +173,17 @@ impl Compilation {
         // Call the emit hook
         self.hooks.emit.call(Some(&mut self.assets));
 
+        // Apply plugins to the compilation
+        if let Some(plugins) = &self.options.plugins.clone() {
+            if !plugins.is_empty() {
+                let context_dir = self.options.context.clone().unwrap_or_else(|| std::env::current_dir().unwrap().to_string_lossy().to_string());
+                let plugin_result = crate::plugin_system::apply_plugins_to_compilation(self, plugins, &context_dir);
+                if let Err(e) = plugin_result {
+                    println!("Error applying plugins: {}", e);
+                }
+            }
+        }
+
         // Write files to disk
         let output_path = Path::new(&self.options.output.path);
         println!("Output path: {:?}", output_path);
@@ -204,9 +215,13 @@ impl Compilation {
             None => Vec::new(),
         };
 
+        // 获取上下文目录
+        let _context_dir = self.options.context.clone().unwrap_or_else(|| std::env::current_dir().unwrap().to_string_lossy().to_string());
+
+        // 查找匹配的loaders
         let loaders = find_matching_loaders(Path::new(module_path), &rules);
 
-        // Apply loaders
+        // 应用loaders
         let processed_code = apply_loaders(&source_code, &loaders, name, module_path)?;
 
         // Create a module

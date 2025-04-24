@@ -14,7 +14,8 @@ const rspackOptions = {
       entry2: './src/entry2.js',
       'entry-complex': './src/entry-complex.js',
       'simple-test': './src/simple-test.js',
-      'code-splitting': './src/code-splitting.js'
+      'code-splitting': './src/code-splitting.js',
+      'app': './src/app.js'
     }
   },
   output: {
@@ -27,15 +28,39 @@ const rspackOptions = {
   module: {
     rules: [
       {
-        test: '\\.js$',
+        test: '.js',
         use: [
-          path.resolve(__dirname, '../loaders/logger-loader.js')
+          './loaders/logger-loader.js',
+          './loaders/babel-loader.js',
+          './loaders/advanced-loader.js'
+        ]
+      },
+      {
+        test: '.css',
+        use: [
+          './loaders/css-loader.js'
+        ]
+      },
+      {
+        test: '.svg',
+        use: [
+          './loaders/file-loader.js'
+        ]
+      },
+      {
+        test: '.html',
+        use: [
+          './loaders/html-loader.js'
         ]
       }
     ]
   },
   plugins: [
-    'EmitPlugin' // Changed to string to match our simplified Rust implementation
+    'EmitPlugin',
+    'HtmlWebpackPlugin',
+    'MiniCssExtractPlugin',
+    'BannerPlugin',
+    'AdvancedPlugin'
   ]
 };
 

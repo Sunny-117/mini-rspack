@@ -7,7 +7,9 @@ mod compiler;
 mod compilation;
 mod module;
 mod loader;
+mod loader_runner;
 mod plugin;
+mod plugin_system;
 mod utils;
 
 use compiler::Compiler;
