@@ -47,12 +47,6 @@ const rspackOptions = {
         use: [
           './loaders/file-loader.js'
         ]
-      },
-      {
-        test: '.html',
-        use: [
-          './loaders/html-loader.js'
-        ]
       }
     ]
   },
