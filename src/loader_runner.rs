@@ -153,17 +153,35 @@ impl LoaderRunner {
         if output.status.success() {
             let stdout = String::from_utf8_lossy(&output.stdout);
 
+            // 查找最后一个JSON对象（忽略之前的控制台输出）
+            let json_start = stdout.rfind("{").unwrap_or(0);
+            let json_str = &stdout[json_start..];
+
             // 解析JSON输出
-            if let Ok(json) = serde_json::from_str::<serde_json::Value>(&stdout) {
+            if let Ok(json) = serde_json::from_str::<serde_json::Value>(json_str) {
                 if let Some(result) = json.get("result") {
                     if let Some(result_str) = result.as_str() {
-                        return Ok(result_str.to_string());
+                        // 递归解析JSON结果
+                        fn extract_result(source: &str) -> String {
+                            if source.starts_with("{") && source.contains("\"result\":") {
+                                if let Ok(json) = serde_json::from_str::<serde_json::Value>(source) {
+                                    if let Some(result) = json.get("result") {
+                                        if let Some(result_str) = result.as_str() {
+                                            return extract_result(result_str);
+                                        }
+                                    }
+                                }
+                            }
+                            source.to_string()
+                        }
+
+                        return Ok(extract_result(result_str));
                     }
                 }
             }
 
-            // 如果没有JSON输出，返回原始输出
-            Ok(stdout.to_string())
+            // 如果没有JSON输出，返回原始源代码
+            Ok(source_code.to_string())
         } else {
             let stderr = String::from_utf8_lossy(&output.stderr);
             Err(anyhow::anyhow!("Loader execution failed: {}", stderr))

@@ -33,11 +33,11 @@ pub fn generate_bundle_source(chunk: &crate::compilation::Chunk) -> String {
     // Collect all modules from the chunk and its dependencies
     let mut all_modules = Vec::new();
     let mut processed_ids = HashSet::new();
-    
+
     // Add the entry module
     all_modules.push(&chunk.entry_module);
     processed_ids.insert(chunk.entry_module.id.clone());
-    
+
     // Add all other modules from the chunk
     for module in &chunk.modules {
         if !processed_ids.contains(&module.id) {
@@ -45,20 +45,22 @@ pub fn generate_bundle_source(chunk: &crate::compilation::Chunk) -> String {
             processed_ids.insert(module.id.clone());
         }
     }
-    
+
     // Generate module code with unique IDs
     let modules_code = all_modules.iter()
         .map(|module| {
             // Process the source code to replace require paths
             let mut processed_source = module.source.clone();
-            
+
+            // 处理源代码（已在loader_runner中处理过JSON解析）
+
             // Replace require('./path') with __webpack_require__('./path')
             let require_regex = regex::Regex::new(r#"require\(['"](\./[^'"]+)['"]\)"#).unwrap();
             processed_source = require_regex.replace_all(&processed_source, |caps: &regex::Captures| {
                 let path = caps.get(1).unwrap().as_str();
                 format!("__webpack_require__('./src/{}')", path.trim_start_matches("./"))
             }).to_string();
-            
+
             format!(
                 r#"
         "{}": function(module, exports, __webpack_require__) {{
@@ -76,36 +78,36 @@ pub fn generate_bundle_source(chunk: &crate::compilation::Chunk) -> String {
 (() => {{
     // webpackBootstrap
     var __webpack_modules__ = {{{}}};
-    
+
     // The module cache
     var __webpack_module_cache__ = {{}};
-    
+
     // The require function
     function __webpack_require__(moduleId) {{
         // Check if module is in cache
         var cachedModule = __webpack_module_cache__[moduleId];
-        
+
         if (cachedModule !== undefined) {{
             return cachedModule.exports;
         }}
-        
+
         // Create a new module (and put it into the cache)
         var module = __webpack_module_cache__[moduleId] = {{
             id: moduleId,
             loaded: false,
             exports: {{}}
         }};
-        
+
         // Execute the module function
         __webpack_modules__[moduleId](module, module.exports, __webpack_require__);
-        
+
         // Flag the module as loaded
         module.loaded = true;
-        
+
         // Return the exports of the module
         return module.exports;
     }}
-    
+
     // Define __esModule on exports
     __webpack_require__.r = function(exports) {{
         if(typeof Symbol !== 'undefined' && Symbol.toStringTag) {{
@@ -113,7 +115,7 @@ pub fn generate_bundle_source(chunk: &crate::compilation::Chunk) -> String {
         }}
         Object.defineProperty(exports, '__esModule', {{ value: true }});
     }};
-    
+
     // Create a fake namespace object
     __webpack_require__.t = function(value, mode) {{
         if(mode & 1) value = __webpack_require__(value);
@@ -125,20 +127,20 @@ pub fn generate_bundle_source(chunk: &crate::compilation::Chunk) -> String {
         if(mode & 2 && typeof value != 'string') for(var key in value) __webpack_require__.d(ns, key, function(key) {{ return value[key]; }}.bind(null, key));
         return ns;
     }};
-    
+
     // Define getter function for harmony exports
     __webpack_require__.d = function(exports, name, getter) {{
         if(!__webpack_require__.o(exports, name)) {{
             Object.defineProperty(exports, name, {{ enumerable: true, get: getter }});
         }}
     }};
-    
+
     // Define property getter
     __webpack_require__.o = function(obj, prop) {{ return Object.prototype.hasOwnProperty.call(obj, prop); }};
-    
+
     // Define export property
     __webpack_require__.s = "";
-    
+
     // Load entry module and return exports
     return __webpack_require__("{}");
 }})();
