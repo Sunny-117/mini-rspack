@@ -25,7 +25,7 @@ mini-rspack is a proof-of-concept JavaScript bundler that uses Rust for the core
 
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/mini-rspack.git
+git clone https://github.com/Sunny-117/mini-rspack.git
 cd mini-rspack
 
 # Install dependencies

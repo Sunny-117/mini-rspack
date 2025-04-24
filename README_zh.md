@@ -25,7 +25,7 @@ mini-rspack 是一个概念验证性的 JavaScript 打包工具，它使用 Rust
 
 ```bash
 # 克隆仓库
-git clone https://github.com/yourusername/mini-rspack.git
+git clone https://github.com/Sunny-117/mini-rspack.git
 cd mini-rspack
 
 # 安装依赖
