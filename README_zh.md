@@ -136,14 +136,35 @@ npm test
 
 ## 文档
 
-详细文档可在 `docs` 目录中找到。您可以使用以下命令构建和查看文档：
+详细文档可在 `docs` 目录中找到。您可以使用提供的脚本构建和查看文档：
+
+### 本地预览文档
 
 ```bash
-cd docs
-pnpm install
-pnpm docs:dev
-pnpm docs:build
+# 使脚本可执行
+chmod +x ./preview-docs.sh
+
+# 运行预览脚本
+./preview-docs.sh
 ```
+
+### 将文档部署到 GitHub Pages
+
+```bash
+# 使脚本可执行
+chmod +x ./deploy-docs.sh
+
+# 运行部署脚本
+./deploy-docs.sh
+```
+
+此脚本将：
+1. 构建文档
+2. 创建或更新 gh-pages 分支
+3. 将构建的文档推送到 gh-pages 分支
+4. 返回您的原始分支
+
+文档将在 https://Sunny-117.github.io/mini-rspack/ 上可用
 
 ## 教学资源
 

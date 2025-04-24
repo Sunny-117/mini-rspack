@@ -136,14 +136,37 @@ npm test
 
 ## Documentation
 
-Detailed documentation is available in the `docs` directory. You can build and view the documentation using:
+Detailed documentation is available in the `docs` directory. You can build and view the documentation using the provided scripts:
+
+### Preview Documentation Locally
 
 ```bash
-cd docs
-pnpm install
-pnpm docs:build
-pnpm preview
+# Make the script executable
+chmod +x ./preview-docs.sh
+
+# Run the preview script
+./preview-docs.sh
 ```
+
+This will build the documentation and start a local server at http://localhost:5173/mini-rspack/
+
+### Deploy Documentation to GitHub Pages
+
+```bash
+# Make the script executable
+chmod +x ./deploy-docs.sh
+
+# Run the deployment script
+./deploy-docs.sh
+```
+
+This script will:
+1. Build the documentation
+2. Create or update the gh-pages branch
+3. Push the built documentation to the gh-pages branch
+4. Return to your original branch
+
+The documentation will be available at https://Sunny-117.github.io/mini-rspack/
 
 ## Educational Resources
 
