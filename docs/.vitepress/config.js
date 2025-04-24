@@ -1,4 +1,5 @@
 export default {
+  base: '/mini-rspack/',
   title: 'mini-rspack',
   description: 'A simplified implementation of webpack bundler using Rust',
   themeConfig: {

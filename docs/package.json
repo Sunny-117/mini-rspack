@@ -4,8 +4,8 @@
   "description": "Documentation for mini-rspack",
   "main": "index.js",
   "scripts": {
-    "dev": "vitepress dev",
-    "build": "vitepress build",
+    "docs:dev": "vitepress dev",
+    "docs:build": "vitepress build",
     "preview": "vitepress preview"
   },
   "keywords": [
