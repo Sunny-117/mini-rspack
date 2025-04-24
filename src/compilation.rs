@@ -167,22 +167,33 @@ impl Compilation {
             }
         }
 
-        // Update files list
+        // 初始更新 files 列表
         self.files = self.assets.keys().cloned().collect();
 
-        // Call the emit hook
-        self.hooks.emit.call(Some(&mut self.assets));
-
-        // Apply plugins to the compilation
+        // 应用插件到编译过程
         if let Some(plugins) = &self.options.plugins.clone() {
             if !plugins.is_empty() {
+                println!("Applying plugins to compilation: {:?}", plugins);
+
+                // 获取上下文目录
                 let context_dir = self.options.context.clone().unwrap_or_else(|| std::env::current_dir().unwrap().to_string_lossy().to_string());
+
+                // 应用插件
                 let plugin_result = crate::plugin_system::apply_plugins_to_compilation(self, plugins, &context_dir);
                 if let Err(e) = plugin_result {
                     println!("Error applying plugins: {}", e);
+                } else {
+                    println!("Plugins applied successfully");
                 }
+
+                // 在应用插件后再次更新 files 列表，确保包含插件添加的文件
+                self.files = self.assets.keys().cloned().collect();
+                println!("Updated files list after applying plugins: {:?}", self.files);
             }
         }
+
+        // 调用 emit 钩子
+        self.hooks.emit.call(Some(&mut self.assets));
 
         // Write files to disk
         let output_path = Path::new(&self.options.output.path);

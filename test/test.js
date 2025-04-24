@@ -57,11 +57,12 @@ const rspackOptions = {
     ]
   },
   plugins: [
+    // 使用插件名称，Rust 会自动查找对应的插件文件
     'EmitPlugin',
     'HtmlWebpackPlugin',
     'MiniCssExtractPlugin',
-    'BannerPlugin',
-    'AdvancedPlugin'
+    'BannerPlugin'
+    // 'AdvancedPlugin' - 暂时移除，因为这个插件可能不存在
   ]
 };
 

@@ -62,17 +62,44 @@ impl PluginSystem {
     }
 
     // 从配置中加载插件
-    pub fn load_plugins_from_config(&mut self, plugin_names: &[String], _base_dir: &str) -> Result<()> {
+    pub fn load_plugins_from_config(&mut self, plugin_names: &[String], base_dir: &str) -> Result<()> {
         for plugin_name in plugin_names {
             // 构建插件路径
             let plugin_path = if plugin_name.ends_with(".js") {
                 // 如果已经是一个JS文件路径
                 plugin_name.clone()
             } else {
-                // 否则，假设它是一个内置插件或node_modules中的插件
-                let current_dir = std::env::current_dir().unwrap_or_else(|_| std::path::PathBuf::from("."));
-                format!("{}/plugins/{}.js", current_dir.to_string_lossy(), plugin_name)
+                // 否则，尝试多种可能的插件路径
+                let base_path = std::path::Path::new(base_dir);
+
+                // 尝试不同的命名约定
+                let kebab_case_name = plugin_name.replace("Plugin", "-plugin").replace("Webpack", "-webpack").to_lowercase();
+
+                // 可能的路径列表
+                let possible_paths = vec![
+                    // 1. plugins/emit-plugin.js (kebab-case)
+                    base_path.join("plugins").join(format!("{}.js", kebab_case_name)),
+                    // 2. plugins/EmitPlugin.js (PascalCase)
+                    base_path.join("plugins").join(format!("{}.js", plugin_name)),
+                    // 3. ./plugins/emit-plugin.js (相对路径)
+                    std::path::Path::new("./plugins").join(format!("{}.js", kebab_case_name)),
+                    // 4. node_modules/emit-plugin (npm包)
+                    base_path.join("node_modules").join(kebab_case_name),
+                ];
+
+                // 查找第一个存在的路径
+                let found_path = possible_paths.iter()
+                    .find(|path| path.exists())
+                    .map(|path| path.to_string_lossy().to_string());
+
+                // 如果找到了路径，使用它；否则使用默认路径
+                found_path.unwrap_or_else(|| {
+                    println!("Warning: Plugin file not found for {}, using default path", plugin_name);
+                    format!("{}/plugins/{}.js", base_dir, plugin_name.to_lowercase().replace("plugin", "-plugin"))
+                })
             };
+
+            println!("Loading plugin: {} from path: {}", plugin_name, plugin_path);
 
             // 添加插件
             self.add_plugin(plugin_name, &plugin_path, serde_json::json!({}));
@@ -122,81 +149,119 @@ impl PluginSystem {
         let mut file = fs::File::create(&input_file)?;
         file.write_all(plugin_input.to_string().as_bytes())?;
 
-        // 创建一个Node.js脚本来执行插件
-        let runner_script = format!(
-            r#"
-            const fs = require('fs');
-            const path = require('path');
+        // 创建一个 Node.js 脚本来执行插件
+        let runner_script = r#"
+const fs = require('fs');
+const path = require('path');
 
-            // 读取输入
-            const inputData = JSON.parse(fs.readFileSync('{}'));
+// 读取命令行参数
+const inputFilePath = process.argv[2];
+const pluginPath = process.argv[3];
 
-            // 加载插件
-            const PluginClass = require('{}');
+try {
+    // 读取输入
+    const inputData = JSON.parse(fs.readFileSync(inputFilePath, 'utf8'));
 
-            // 创建插件实例
-            const plugin = new PluginClass(inputData.options);
+    // 获取插件名称
+    const pluginName = path.basename(pluginPath, '.js');
+    console.log(`Executing plugin: ${pluginName}`);
 
-            // 创建模拟的compiler和compilation对象
-            const compiler = {{
-                options: inputData.context.compiler,
-                hooks: {{}},
-            }};
+    // 加载插件
+    const PluginClass = require(pluginPath);
+    console.log(`Plugin class loaded: ${typeof PluginClass}`);
 
-            const compilation = {{
-                ...inputData.context.compilation,
-                assets: {{}},
-                hooks: {{}},
-            }};
+    // 创建插件实例
+    const plugin = new PluginClass(inputData.options);
+    console.log(`Plugin instance created: ${typeof plugin}`);
 
-            // 为每个钩子创建tap方法
-            const createTapMethod = (hookName) => {{
-                return {{
-                    tap: (name, callback) => {{
-                        console.log(`Plugin '${{}}.js' tapped into hook: ${{hookName}}`);
-                    }}
-                }};
-            }};
+    // 创建模拟的 compiler 和 compilation 对象
+    const compiler = {
+        options: inputData.context.compiler,
+        hooks: {},
+    };
 
-            // 添加所有钩子
-            const hooks = [
-                'beforeRun', 'run', 'beforeCompile', 'compile',
-                'make', 'afterCompile', 'emit', 'afterEmit', 'done'
-            ];
+    // 如果是 emit 钩子，将 assets 添加到 compilation 对象
+    const assets = inputData.hook === 'emit' ? {...inputData.args} : {};
 
-            hooks.forEach(hook => {{
-                compiler.hooks[hook] = createTapMethod(hook);
-                compilation.hooks[hook] = createTapMethod(hook);
-            }});
+    const compilation = {
+        ...inputData.context.compilation,
+        assets: assets,
+        hooks: {},
+    };
 
-            // 应用插件
-            if (typeof plugin.apply === 'function') {{
-                plugin.apply(compiler);
-            }}
+    // 存储回调函数
+    const callbacks = {};
 
-            // 如果是当前钩子，执行相应的处理
-            if (inputData.hook === 'emit' && typeof plugin.emit === 'function') {{
-                const result = plugin.emit(compilation, inputData.args);
-                console.log(JSON.stringify({{ result }}));
-            }} else if (inputData.hook === 'done' && typeof plugin.done === 'function') {{
-                const result = plugin.done(compilation, inputData.args);
-                console.log(JSON.stringify({{ result }}));
-            }} else {{
-                // 返回原始参数
-                console.log(JSON.stringify({{ result: inputData.args }}));
-            }}
-            "#,
-            input_file.to_string_lossy(),
-            plugin_path.to_string_lossy()
-        );
+    // 为每个钩子创建 tap 方法
+    const createTapMethod = (hookName) => {
+        return {
+            tap: (name, callback) => {
+                console.log(`Plugin '${pluginName}' tapped into hook: ${hookName} with name: ${name}`);
+                // 存储回调函数
+                if (!callbacks[hookName]) {
+                    callbacks[hookName] = [];
+                }
+                callbacks[hookName].push({ name, callback });
+            }
+        };
+    };
+
+    // 添加所有钩子
+    const hooks = [
+        'beforeRun', 'run', 'beforeCompile', 'compile',
+        'make', 'afterCompile', 'emit', 'afterEmit', 'done'
+    ];
+
+    hooks.forEach(hook => {
+        compiler.hooks[hook] = createTapMethod(hook);
+        compilation.hooks[hook] = createTapMethod(hook);
+    });
+
+    // 应用插件
+    if (typeof plugin.apply === 'function') {
+        plugin.apply(compiler);
+    } else {
+        console.log(`Warning: Plugin ${pluginName} does not have an apply method`);
+    }
+
+    // 如果是当前钩子，执行相应的回调函数
+    if (inputData.hook === 'emit' && callbacks['emit'] && callbacks['emit'].length > 0) {
+        console.log(`Executing ${callbacks['emit'].length} callbacks for hook: emit`);
+
+        // 执行所有注册到 emit 钩子的回调函数
+        for (const { name, callback } of callbacks['emit']) {
+            console.log(`Executing callback for hook: emit, name: ${name}`);
+            try {
+                // 执行回调函数，传入 assets 对象
+                callback(assets);
+            } catch (error) {
+                console.error(`Error executing callback for hook: emit, name: ${name}`, error);
+            }
+        }
+
+        // 返回更新后的 assets 对象
+        console.log(`Assets after plugin execution: ${Object.keys(assets).join(', ')}`);
+        console.log(JSON.stringify({ result: assets }));
+    } else {
+        // 返回原始参数
+        console.log(`No callbacks found for hook: ${inputData.hook}`);
+        console.log(JSON.stringify({ result: inputData.args }));
+    }
+} catch (error) {
+    console.error('Error executing plugin:', error);
+    console.log(JSON.stringify({ result: {} }));
+}
+"#;
 
         let runner_file = temp_dir.join("plugin_runner.js");
         let mut file = fs::File::create(&runner_file)?;
         file.write_all(runner_script.as_bytes())?;
 
-        // 执行Node.js脚本
+        // 执行 Node.js 脚本，传入输入文件路径和插件路径作为参数
         let output = Command::new("node")
             .arg(&runner_file)
+            .arg(&input_file)
+            .arg(&plugin_path)
             .output()?;
 
         // 清理临时文件
@@ -206,15 +271,23 @@ impl PluginSystem {
         // 解析输出
         if output.status.success() {
             let stdout = String::from_utf8_lossy(&output.stdout);
+            println!("Plugin output: {}", stdout);
 
-            // 解析JSON输出
-            if let Ok(json) = serde_json::from_str::<serde_json::Value>(&stdout) {
-                if let Some(result) = json.get("result") {
-                    return Ok(result.clone());
+            // 尝试从输出中提取 JSON 结果
+            let json_start = stdout.find('{');
+            let json_end = stdout.rfind('}');
+
+            if let (Some(start), Some(end)) = (json_start, json_end) {
+                let json_str = &stdout[start..=end];
+
+                if let Ok(json) = serde_json::from_str::<serde_json::Value>(json_str) {
+                    if let Some(result) = json.get("result") {
+                        return Ok(result.clone());
+                    }
                 }
             }
 
-            // 如果没有JSON输出，返回原始参数
+            // 如果没有找到有效的 JSON 输出，返回原始参数
             Ok(hook_args.clone())
         } else {
             let stderr = String::from_utf8_lossy(&output.stderr);
