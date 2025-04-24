@@ -41,26 +41,35 @@ impl Module {
         self.source = source_code.to_string();
 
         // Simple regex to find require calls
-        let require_regex = regex::Regex::new(r#"require\(['"](.*?)['"](\))"#).unwrap();
+        let require_regex = regex::Regex::new(r#"require\(['"](.+?)['"]\)"#).unwrap();
 
         for cap in require_regex.captures_iter(source_code) {
             if let Some(module_name) = cap.get(1) {
                 let module_name = module_name.as_str();
+                println!("Found dependency: {}", module_name);
 
                 // Resolve the module path
                 let dirname = module_path.parent().unwrap();
                 let dep_module_path = dirname.join(module_name);
+                println!("Resolving path: {:?}", dep_module_path);
 
                 // Try to resolve with extensions
-                if let Ok(resolved_path) = crate::utils::try_extensions(&dep_module_path, resolve_extensions) {
-                    // Get the module ID (relative to base_dir)
-                    let dep_module_id = format!("./{}", pathdiff::diff_paths(&resolved_path, base_dir).unwrap().to_string_lossy());
+                match crate::utils::try_extensions(&dep_module_path, resolve_extensions) {
+                    Ok(resolved_path) => {
+                        println!("Resolved to: {:?}", resolved_path);
+                        // Get the module ID (relative to base_dir)
+                        let dep_module_id = format!("./{}", pathdiff::diff_paths(&resolved_path, base_dir).unwrap().to_string_lossy());
+                        println!("Module ID: {}", dep_module_id);
 
-                    // Add the dependency
-                    self.dependencies.push(Dependency {
-                        dep_module_id,
-                        dep_module_path: resolved_path.to_string_lossy().to_string(),
-                    });
+                        // Add the dependency
+                        self.dependencies.push(Dependency {
+                            dep_module_id,
+                            dep_module_path: resolved_path.to_string_lossy().to_string(),
+                        });
+                    },
+                    Err(err) => {
+                        eprintln!("Failed to resolve module {}: {}", module_name, err);
+                    }
                 }
             }
         }

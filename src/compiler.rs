@@ -2,8 +2,11 @@ use napi_derive::napi;
 use napi::threadsafe_function::{ThreadsafeFunction, ThreadsafeFunctionCallMode};
 use napi::{JsFunction, Result};
 
+
 use crate::RspackOptions;
 use crate::plugin::SyncHook;
+use crate::compilation::{Compilation, CompilationHooks};
+use crate::plugin::register_emit_plugin;
 
 #[napi(object)]
 #[derive(Debug, Clone)]
@@ -72,28 +75,72 @@ fn run_compiler_internal(compiler: &Compiler, callback: ThreadsafeFunction<Stats
     // Call the run hook
     compiler.hooks.run.call(None);
 
-    // 简化版实现 - 在实际实现中，我们会创建一个编译过程
-    // 这里我们只是模拟一个成功的编译
-
-    // Call the done hook
-    compiler.hooks.done.call(None);
-
-    // Create a simple stats object
-    let stats = Stats {
-        entries: vec!["entry1.js".to_string(), "entry2.js".to_string()],
-        chunks: vec!["chunk1".to_string(), "chunk2".to_string()],
-        modules: vec!["module1".to_string(), "module2".to_string()],
-        files: vec!["entry1.js".to_string(), "entry2.js".to_string()],
-        assets: vec!["entry1.js".to_string(), "entry2.js".to_string()],
+    // 创建一个编译实例
+    let compilation_hooks = CompilationHooks {
+        emit: SyncHook::new("emit"),
     };
 
-    // Call the callback with the stats
-    callback.call(
-        Ok(stats),
-        ThreadsafeFunctionCallMode::Blocking,
-    );
+    let mut compilation = Compilation::new(compiler.options.clone(), compilation_hooks);
 
-    Ok(())
+    // 注册插件
+    if let Some(plugins) = &compiler.options.plugins {
+        if plugins.contains(&"EmitPlugin".to_string()) {
+            register_emit_plugin(&mut compilation);
+        }
+    }
+
+    // 执行编译过程
+    match compilation.make() {
+        Ok(_) => {
+            // 编译成功
+            // Call the done hook
+            compiler.hooks.done.call(None);
+
+            // 创建真实的stats对象
+            let entries = compilation.entries.iter().map(|chunk| chunk.name.clone()).collect();
+            let chunks = compilation.chunks.iter().map(|chunk| chunk.name.clone()).collect();
+            let modules = compilation.modules.iter().map(|module| module.id.clone()).collect();
+            let files = compilation.files.clone();
+            let assets = compilation.assets.keys().cloned().collect();
+
+            let stats = Stats {
+                entries,
+                chunks,
+                modules,
+                files,
+                assets,
+            };
+
+            // Call the callback with the stats
+            callback.call(
+                Ok(stats),
+                ThreadsafeFunctionCallMode::Blocking,
+            );
+
+            Ok(())
+        },
+        Err(err) => {
+            // 编译失败
+            eprintln!("Compilation failed: {:?}", err);
+
+            // 创建空的stats对象
+            let _stats = Stats {
+                entries: vec![],
+                chunks: vec![],
+                modules: vec![],
+                files: vec![],
+                assets: vec![],
+            };
+
+            // Call the callback with an error
+            callback.call(
+                Err(napi::Error::new(napi::Status::GenericFailure, format!("Compilation failed: {:?}", err))),
+                ThreadsafeFunctionCallMode::Blocking,
+            );
+
+            Ok(())
+        }
+    }
 }
 
 // 内部函数，不导出到JS

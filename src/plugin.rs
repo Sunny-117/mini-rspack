@@ -6,6 +6,11 @@ pub trait Plugin {
     fn apply(&self, compiler: &mut crate::compiler::Compiler);
 }
 
+// Define a trait for compilation plugins
+pub trait CompilationPlugin {
+    fn apply(&self, compilation: &mut crate::compilation::Compilation);
+}
+
 // Hook system similar to tapable in JS
 #[napi(object)]
 #[derive(Debug, Clone)]
@@ -46,8 +51,14 @@ impl Plugin for EmitPlugin {
     }
 }
 
+impl CompilationPlugin for EmitPlugin {
+    fn apply(&self, compilation: &mut crate::compilation::Compilation) {
+        compilation.hooks.emit.tap("EmitPlugin");
+    }
+}
+
 // This function would be called from JS to register the plugin
-pub fn register_emit_plugin(compiler: &mut crate::compiler::Compiler) {
+pub fn register_emit_plugin(compilation: &mut crate::compilation::Compilation) {
     let plugin = EmitPlugin;
-    plugin.apply(compiler);
+    CompilationPlugin::apply(&plugin, compilation);
 }

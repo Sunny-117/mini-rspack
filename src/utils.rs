@@ -33,9 +33,10 @@ pub fn generate_bundle_source(chunk: &crate::compilation::Chunk) -> String {
         .map(|module| {
             format!(
                 r#"
-                "{}":(module,exports,require)=>{{
-                    {}
-                }}"#,
+        "{}":(module,exports,require)=>{{
+            {}
+        }}
+                "#,
                 module.id,
                 module.source
             )
@@ -46,29 +47,41 @@ pub fn generate_bundle_source(chunk: &crate::compilation::Chunk) -> String {
     format!(
         r#"
 (() => {{
-    var modules = ({{
-        {}
+    // webpackBootstrap
+    var __webpack_modules__ = ({{
+{}
     }});
-    var cache = {{}};
-    function require(moduleId) {{
-      var cachedModule = cache[moduleId];
-      if (cachedModule !== undefined) {{
-        return cachedModule.exports;
-      }}
-      var module = cache[moduleId] = {{
-        exports: {{}}
-      }};
-      modules[moduleId](module, module.exports, require);
-      return module.exports;
+    
+    // The module cache
+    var __webpack_module_cache__ = {{}};
+    
+    // The require function
+    function __webpack_require__(moduleId) {{
+        // Check if module is in cache
+        var cachedModule = __webpack_module_cache__[moduleId];
+        
+        if (cachedModule !== undefined) {{
+            return cachedModule.exports;
+        }}
+        
+        // Create a new module (and put it into the cache)
+        var module = __webpack_module_cache__[moduleId] = {{
+            exports: {{}}
+        }};
+        
+        // Execute the module function
+        __webpack_modules__[moduleId](module, module.exports, __webpack_require__);
+        
+        // Return the exports of the module
+        return module.exports;
     }}
-    var exports = {{}};
-    (() => {{
-     {}
-    }})();
-  }})()
-    ;
+    
+    // Execute the entry module
+    var __webpack_exports__ = __webpack_require__("{}");
+    
+}})();
 "#,
         modules_code,
-        chunk.entry_module.source
+        chunk.entry_module.id
     )
 }
