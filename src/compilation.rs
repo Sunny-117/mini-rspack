@@ -68,10 +68,21 @@ impl Compilation {
             let entry_module = self.build_module(&entry_name, &entry_file_path, base_dir)?;
 
             // Create a chunk for this entry
+            // Deduplicate modules by ID
+            let mut unique_modules = Vec::new();
+            let mut module_ids = std::collections::HashSet::new();
+
+            for module in self.modules.iter().filter(|m| m.name == *entry_name) {
+                if !module_ids.contains(&module.id) {
+                    module_ids.insert(module.id.clone());
+                    unique_modules.push(module.clone());
+                }
+            }
+
             let chunk = Chunk {
                 name: entry_name.clone(),
                 entry_module: entry_module.clone(),
-                modules: self.modules.clone().into_iter().filter(|m| m.name == *entry_name).collect(),
+                modules: unique_modules,
             };
 
             // Add the chunk to entries and chunks
