@@ -4,9 +4,10 @@ console.log('Code splitting test started');
 // 动态导入模块
 function loadModule(name) {
   console.log(`Loading module: ${name}`);
-  
+
   if (name === 'dynamic') {
-    return import('./dynamic-module.js')
+    // 使用相对路径导入模块
+    return import('./src-dynamic-module.js')
       .then(module => {
         console.log('Dynamic module loaded');
         return {
@@ -17,7 +18,8 @@ function loadModule(name) {
         };
       });
   } else if (name === 'complex') {
-    return import('./complex-esm.js')
+    // 使用相对路径导入模块
+    return import('./src-complex-esm.js')
       .then(module => {
         console.log('Complex module loaded');
         return {

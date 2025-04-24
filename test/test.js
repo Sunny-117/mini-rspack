@@ -13,7 +13,8 @@ const rspackOptions = {
       entry1: './src/entry1.js',
       entry2: './src/entry2.js',
       'entry-complex': './src/entry-complex.js',
-      'simple-test': './src/simple-test.js'
+      'simple-test': './src/simple-test.js',
+      'code-splitting': './src/code-splitting.js'
     }
   },
   output: {
