@@ -10,12 +10,12 @@ const rspackOptions = {
   context: process.cwd(),
   entry: {
     entries: {
-      entry1: './src/entry1.js',
-      entry2: './src/entry2.js',
-      'entry-complex': './src/entry-complex.js',
-      'simple-test': './src/simple-test.js',
-      'code-splitting': './src/code-splitting.js',
-      'app': './src/app.js'
+      entry1: './test/src/entry1.js',
+      entry2: './test/src/entry2.js',
+      'entry-complex': './test/src/entry-complex.js',
+      'simple-test': './test/src/simple-test.js',
+      'code-splitting': './test/src/code-splitting.js',
+      'app': './test/src/app.js'
     }
   },
   output: {
