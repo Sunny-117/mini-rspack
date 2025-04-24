@@ -54,11 +54,23 @@ pub fn generate_bundle_source(chunk: &crate::compilation::Chunk) -> String {
 
             // 处理源代码（已在loader_runner中处理过JSON解析）
 
-            // Replace require('./path') with __webpack_require__('./path')
+            // Replace require('./path') with __webpack_require__('./test/src/path')
             let require_regex = regex::Regex::new(r#"require\(['"](\./[^'"]+)['"]\)"#).unwrap();
             processed_source = require_regex.replace_all(&processed_source, |caps: &regex::Captures| {
                 let path = caps.get(1).unwrap().as_str();
-                format!("__webpack_require__('./src/{}')", path.trim_start_matches("./"))
+
+                // Get the module directory from the module ID
+                let module_dir = if let Some(idx) = module.id.rfind('/') {
+                    module.id[0..idx+1].to_string()
+                } else {
+                    "./".to_string()
+                };
+
+                // Resolve the path relative to the module directory
+                let resolved_path = format!("{}{}", module_dir, path.trim_start_matches("./"));
+
+                // Use the correct module ID format that matches the keys in __webpack_modules__
+                format!("__webpack_require__('{}')", resolved_path)
             }).to_string();
 
             format!(
