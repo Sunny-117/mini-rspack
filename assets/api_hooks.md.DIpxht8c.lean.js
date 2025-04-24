@@ -1,0 +1,1 @@
+import{_ as i,c as a,o as t,ae as n}from"./chunks/framework.osJJb4L7.js";const E=JSON.parse('{"title":"Hooks API","description":"","frontmatter":{},"headers":[],"relativePath":"api/hooks.md","filePath":"api/hooks.md"}'),h={name:"api/hooks.md"};function l(e,s,p,k,r,d){return t(),a("div",null,s[0]||(s[0]=[n("",70)]))}const g=i(h,[["render",l]]);export{E as __pageData,g as default};
