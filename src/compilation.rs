@@ -94,6 +94,7 @@ impl Compilation {
 
         // Write files to disk
         let output_path = Path::new(&self.options.output.path);
+        println!("Output path: {:?}", output_path);
         for (filename, content) in &self.assets {
             let file_path = output_path.join(filename);
 
@@ -101,7 +102,7 @@ impl Compilation {
             if let Some(parent) = file_path.parent() {
                 fs::create_dir_all(parent)?;
             }
-
+            println!("Writing file: {:?}", file_path);
             // Write the file
             fs::write(&file_path, content)?;
         }

@@ -5,7 +5,7 @@ hero:
   text: A simplified webpack bundler using Rust
   tagline: High-performance JavaScript bundling with Rust and Node.js
   image:
-    src: /logo.png
+    src: https://assets.rspack.dev/rspack/rspack-logo.svg
     alt: mini-rspack
   actions:
     - theme: brand

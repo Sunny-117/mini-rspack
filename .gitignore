@@ -26,3 +26,4 @@ dist-ssr
 /target
 
 .DS_Store
+.vitepress

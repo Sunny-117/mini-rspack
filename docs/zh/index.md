@@ -5,7 +5,7 @@ hero:
   text: 使用 Rust 实现的简化版 webpack 打包工具
   tagline: 基于 Rust 和 Node.js 的高性能 JavaScript 打包工具
   image:
-    src: /logo.png
+    src: https://assets.rspack.dev/rspack/rspack-logo.svg
     alt: mini-rspack
   actions:
     - theme: brand
