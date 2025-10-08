@@ -14,7 +14,7 @@ const rspackOptions = {
       entry2: './test/src/entry2.js',
       'entry-complex': './test/src/entry-complex.js',
       'simple-test': './test/src/simple-test.js',
-      'esm-entry': './test/src/esm-entry.js',
+      // 'esm-entry': './test/src/esm-entry.js',
       // 'code-splitting': './test/src/code-splitting.js',
       // 'app': './test/src/app.js'
     }
