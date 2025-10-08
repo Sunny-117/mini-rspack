@@ -1,7 +1,7 @@
 const path = require('path');
 const { rspack } = require('../index');
 const EmitPlugin = require('../plugins/emit-plugin');
-
+const HtmlWebpackPlugin = require('../plugins/html-webpack-plugin');
 // Create rspack options similar to the JS version
 const rspackOptions = {
   mode: 'production',
@@ -55,8 +55,11 @@ const rspackOptions = {
     'EmitPlugin',
     'HtmlWebpackPlugin',
     'MiniCssExtractPlugin',
-    'BannerPlugin'
+    'BannerPlugin',
     // 'AdvancedPlugin' - 暂时移除，因为这个插件可能不存在
+    // new HtmlWebpackPlugin({
+    //   template: path.resolve(__dirname, 'test/src/template.html')
+    // })
   ]
 };
 

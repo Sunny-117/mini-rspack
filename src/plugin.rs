@@ -77,6 +77,8 @@ impl CompilationPlugin for JsPlugin {
     <title>Mini Rspack App</title>
 </head>
 <body>
+    <h1>Mini Rspack App</h1>
+    <p>This is a sample app built with mini-rspack.</p>
     <div id="app"></div>
     <script src="{}.js"></script>
 </body>
